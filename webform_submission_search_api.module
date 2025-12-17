@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Webform Submission Search API module hooks.
+ */
+
+use Drupal\webform\WebformSubmissionInterface;
+
+/**
+ * Implements hook_webform_submission_update().
+ *
+ * Mark webform submissions for reindexing when they are updated.
+ */
+function webform_submission_search_api_webform_submission_update(WebformSubmissionInterface $webform_submission) {
+  // Get all search API indexes that track webform submissions.
+  $index_storage = \Drupal::entityTypeManager()->getStorage('search_api_index');
+  $indexes = $index_storage->loadMultiple();
+
+  foreach ($indexes as $index) {
+    // Check if this index tracks webform submissions.
+    $datasources = $index->getDatasources();
+    foreach ($datasources as $datasource) {
+      if ($datasource->getEntityTypeId() === 'webform_submission') {
+        // Mark the item for reindexing.
+        $item_id = 'entity:webform_submission/' . $webform_submission->id() . ':' . $webform_submission->language()->getId();
+        $index->trackItemsUpdated('entity:webform_submission', [$item_id]);
+        break;
+      }
+    }
+  }
+}
