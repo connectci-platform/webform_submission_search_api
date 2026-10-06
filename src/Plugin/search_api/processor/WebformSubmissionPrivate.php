@@ -11,8 +11,9 @@ use Drupal\webform\WebformSubmissionInterface;
 /**
  * Indexes the "private" checkbox of a Webform Submission as 0 or 1.
  *
- * A missing value is always indexed as 0 so that a "= 0" filter matches
- * submissions that never stored the element.
+ * Only a stored value of 1 indexes as 1, the same rule as
+ * KbResourceRepository::isPublic() in access_cilink. Anything else,
+ * including a missing value, indexes as 0.
  *
  * @SearchApiProcessor(
  *   id = "webform_submission_private",
@@ -65,7 +66,7 @@ class WebformSubmissionPrivate extends ProcessorPluginBase {
     }
 
     // Always emit 0 or 1; an empty value would not match a "= 0" filter.
-    $value = $entity->getElementData(self::ELEMENT) ? 1 : 0;
+    $value = (int) $entity->getElementData(self::ELEMENT) === 1 ? 1 : 0;
 
     $fields = $this->getFieldsHelper()
       ->filterForPropertyPath($item->getFields(), NULL, self::PROPERTY_PATH);

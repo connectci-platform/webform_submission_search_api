@@ -72,6 +72,7 @@ class WebformSubmissionFlagProcessorTest extends UnitTestCase {
     $this->assertSame([0], $this->emitted($class, $path, ['private' => '']));
     $this->assertSame([1], $this->emitted($class, $path, ['private' => '1']));
     $this->assertSame([1], $this->emitted($class, $path, ['private' => 1]));
+    $this->assertSame([0], $this->emitted($class, $path, ['private' => '2']), 'Only 1 counts as private, as in isPublic().');
   }
 
   /**
@@ -83,6 +84,7 @@ class WebformSubmissionFlagProcessorTest extends UnitTestCase {
     $this->assertSame([0], $this->emitted($class, $path, []), 'Missing approved emits 0.');
     $this->assertSame([0], $this->emitted($class, $path, ['approved' => '0']));
     $this->assertSame([1], $this->emitted($class, $path, ['approved' => '1']));
+    $this->assertSame([0], $this->emitted($class, $path, ['approved' => 'yes']), 'Only 1 counts as approved, as in isPublic().');
   }
 
 }
