@@ -32,7 +32,7 @@ class WebformSubmissionSearchApiSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events['flag.entity_flagged'] = ['flagEntityFlagged'];
     $events['flag.entity_unflagged'] = ['flagEntityUnflagged'];
 
