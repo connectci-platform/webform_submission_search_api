@@ -4,6 +4,7 @@ namespace Drupal\webform_submission_search_api;
 
 use Drupal\flag\FlaggingInterface;
 use Drupal\search_api\Plugin\search_api\datasource\ContentEntity;
+use Drupal\search_api\Utility\Utility;
 
 /**
  * Class WebformSubmissionSearchApiReindexService.
@@ -35,6 +36,19 @@ class WebformSubmissionSearchApiReindexService implements WebformSubmissionSearc
     foreach ($indexes as $index) {
       if ($updated_item_ids) {
         $index->trackItemsUpdated($datasource_id, $updated_item_ids);
+        // With "index_directly", Search API only indexes at the end of the
+        // request, after the flag link's redirect has been sent, so the page
+        // the user lands on would still show the old vote count and order.
+        // Index now so the redirect target is current.
+        if (!$index->isReadOnly() && $index->getOption('index_directly')) {
+          $combined_ids = array_map(function ($item_id) use ($datasource_id) {
+            return Utility::createCombinedId($datasource_id, $item_id);
+          }, $updated_item_ids);
+          $items = $index->loadItemsMultiple($combined_ids);
+          if ($items) {
+            $index->indexSpecificItems($items);
+          }
+        }
       }
     }
   }
