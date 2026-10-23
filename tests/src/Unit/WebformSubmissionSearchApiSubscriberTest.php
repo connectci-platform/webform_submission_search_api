@@ -3,6 +3,7 @@
 namespace Drupal\Tests\webform_submission_search_api\Unit;
 
 use Drupal\flag\Event\FlaggingEvent;
+use Drupal\flag\FlagCountManager;
 use Drupal\flag\Event\UnflaggingEvent;
 use Drupal\flag\FlaggingInterface;
 use Drupal\Tests\UnitTestCase;
@@ -51,8 +52,13 @@ class WebformSubmissionSearchApiSubscriberTest extends UnitTestCase {
    */
   public function testGetSubscribedEvents(): void {
     $events = WebformSubmissionSearchApiSubscriber::getSubscribedEvents();
-    $this->assertSame(['flagEntityFlagged'], $events['flag.entity_flagged']);
-    $this->assertSame(['flagEntityUnflagged'], $events['flag.entity_unflagged']);
+    $this->assertSame(['flagEntityFlagged', -200], $events['flag.entity_flagged']);
+    $this->assertSame(['flagEntityUnflagged', -200], $events['flag.entity_unflagged']);
+
+    // Pin the ordering: the count must be updated before we index it.
+    $flag_events = FlagCountManager::getSubscribedEvents();
+    $this->assertLessThan($flag_events['flag.entity_flagged'][0][1], $events['flag.entity_flagged'][1]);
+    $this->assertLessThan($flag_events['flag.entity_unflagged'][0][1], $events['flag.entity_unflagged'][1]);
   }
 
   /**
