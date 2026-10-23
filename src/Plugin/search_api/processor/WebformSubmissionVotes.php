@@ -33,7 +33,7 @@ class WebformSubmissionVotes extends ProcessorPluginBase {
       $definition = [
         'label' => $this->t('Vote Count'),
         'description' => $this->t('Vote Count for Webform Submission.'),
-        'type' => 'string',
+        'type' => 'integer',
         'processor_id' => $this->getPluginId(),
       ];
       $properties['search_api_webform_submission_vote_count'] = new ProcessorProperty($definition);
@@ -50,7 +50,7 @@ class WebformSubmissionVotes extends ProcessorPluginBase {
 
     $flag_upvote_count = \Drupal::service('flag.count')->getEntityFlagCounts($webform_submission);
     $flag_upvote_set = $flag_upvote_count['upvote'] ?? 0;
-    $flag_upvote_count = $flag_upvote_set ? $flag_upvote_count['upvote'] : 0;
+    $flag_upvote_count = $flag_upvote_set ? (int) $flag_upvote_count['upvote'] : 0;
 
     if ($flag_upvote_count !== NULL) {
       $fields = $this->getFieldsHelper()

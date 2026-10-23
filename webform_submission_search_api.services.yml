@@ -1,7 +1,10 @@
 services:
+  logger.channel.webform_submission_search_api:
+    parent: logger.channel_base
+    arguments: ['webform_submission_search_api']
   webform_submission_search_api.reindex:
     class: Drupal\webform_submission_search_api\WebformSubmissionSearchApiReindexService
-    arguments: ['@config.factory']
+    arguments: ['@logger.channel.webform_submission_search_api', '@search_api.post_request_indexing']
   webform_submission_search_api.event_subscriber:
     class: Drupal\webform_submission_search_api\EventSubscriber\WebformSubmissionSearchApiSubscriber
     arguments: ['@webform_submission_search_api.reindex']
